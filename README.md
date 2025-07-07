@@ -112,5 +112,8 @@ settings = Settings.load_from_env(app_prefix="APP", pretty_check=True)
 
 ### Release
 
+(https://github.com/alltuner/uv-version-bumper)
 just bump-patch|minor|major
 just push-all
+
+uv run pytest -v

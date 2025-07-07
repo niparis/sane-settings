@@ -128,7 +128,9 @@ class EnvConfigBase:
                 raw_value = os.getenv(full_env_var_name)
                 if raw_value is None:
                     if f.default != dataclasses.MISSING:
-                        config_kwargs[f.name] = f.default
+                        config_kwargs = _cast_var(
+                            f.type, f.name, f.default, config_kwargs, full_env_var_name
+                        )
                         logger.debug(
                             f"field {f.name} loading from {full_env_var_name} used its default value"
                         )
