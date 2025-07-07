@@ -133,9 +133,7 @@ class EnvConfigBase:
                             f"field {f.name} loading from {full_env_var_name} used its default value"
                         )
                     else:
-                        raise MissingEnvVarError(
-                            f"Required environment variable '{full_env_var_name}' is not set for attribute '{f.name}'."
-                        )
+                        raise MissingEnvVarError(full_env_var_name, f.name)
                 else:
                     config_kwargs = _cast_var(
                         f.type, f.name, raw_value, config_kwargs, full_env_var_name
