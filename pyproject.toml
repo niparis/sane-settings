@@ -8,7 +8,7 @@ authors = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "loguru>=0.7",
+    "loguru",
 ]
 
 [build-system]
