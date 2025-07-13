@@ -18,15 +18,18 @@ def _cast_var(
 ):
     try:
         if ftype is bool:
-            match raw_value.lower():
-                case "true" | "1" | "t" | "yes":
-                    config_kwargs[name] = True
-                case "false" | "0" | "f" | "no":
-                    config_kwargs[name] = False
-                case _:
-                    raise InvalidTypeError(
-                        f"Failed to cast env var '{full_env_var_name}' (value: '{raw_value}') to type {ftype.__name__} for attribute '{name}'."
-                    )
+            if isinstance(raw_value, bool):
+                config_kwargs[name] = raw_value
+            else:
+                match str(raw_value).lower():
+                    case "true" | "1" | "t" | "yes":
+                        config_kwargs[name] = True
+                    case "false" | "0" | "f" | "no":
+                        config_kwargs[name] = False
+                    case _:
+                        raise InvalidTypeError(
+                            f"Failed to cast env var '{full_env_var_name}' (value: '{raw_value}') to type {ftype.__name__} for attribute '{name}'."
+                        )
         elif typing.get_origin(ftype) is typing.Literal:
             if raw_value in typing.get_args(ftype):
                 config_kwargs[name] = raw_value
