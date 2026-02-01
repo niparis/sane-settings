@@ -3,18 +3,18 @@ import types
 import typing
 from typing import Any, TypeVar
 import dataclasses
-from  dataclasses import dataclass
+from dataclasses import dataclass
 from pprint import pprint
 
 from loguru import logger
 from .exceptions import MissingEnvVarError, InvalidTypeError
 
 
-
 T = TypeVar("T")
 
+
 def _cast_var(
-    ftype: types, name: str, raw_value: Any, config_kwargs: dict, full_env_var_name: str
+    ftype: Any, name: str, raw_value: Any, config_kwargs: dict, full_env_var_name: str
 ):
     try:
         if ftype is bool:
@@ -37,7 +37,7 @@ def _cast_var(
                 raise InvalidTypeError(
                     f"Failed to cast env var '{full_env_var_name}' (value: '{raw_value}') to Literral for attribute '{name}'. Allowed values are {','.join(typing.get_args(ftype))}"
                 )
-        elif typing.get_origin(ftype) is types.UnionType:
+        elif typing.get_origin(ftype) in (types.UnionType, typing.Union):
             union_types = typing.get_args(ftype)
             if len(union_types) == 2 and types.NoneType in union_types:
                 if raw_value in ("None", "none", None):
@@ -60,7 +60,6 @@ def _cast_var(
         )
 
     return config_kwargs
-
 
 
 @dataclass
@@ -90,7 +89,7 @@ class EnvConfigBase:
                 )
 
                 # Handle Union types (like Optional[SomeConfig])
-                if typing.get_origin(f.type) is types.UnionType:
+                if typing.get_origin(f.type) in (types.UnionType, typing.Union):
                     union_types = typing.get_args(f.type)
                     if len(union_types) == 2 and types.NoneType in union_types:
                         # Check if the prefix exists in environment variables
