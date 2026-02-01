@@ -41,7 +41,7 @@ settings = AppSettings.load_from_env(app_prefix="MYAPP")
 
 # Access nested settings
 print(settings.database.host)  # Uses MYAPP_DB_HOST
-print(settings.password)       # SecretStr('**********')
+print(settings.database.password)  # SecretStr('**********')
 ```
 
 ## Design Goals
