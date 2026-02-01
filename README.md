@@ -4,6 +4,46 @@ Simply Sane Settings
 
 Born of the desire of having app config behaving in an explicit way, to zero in and fix missing config very quickly
 
+## Key Principles
+
+1. **Explicit is better than implicit** - Never silently use defaults when you meant to configure something
+2. **Fail fast with clarity** - Missing env vars show you exactly what was expected
+3. **Debuggability** - Debug logs highlight when defaults are used, helping catch typos
+4. **Security** - Secret values are masked in logs automatically
+
+## Installation
+
+```bash
+pip install sane-settings
+```
+
+Requires Python 3.10 or higher.
+
+## Quick Start
+
+```python
+from dataclasses import dataclass
+from sane_settings import EnvConfigBase, env_field, prefix_field, SecretStr
+
+@dataclass
+class DatabaseSettings(EnvConfigBase):
+    host: str = env_field("HOST", default="localhost")
+    port: int = env_field("PORT", default=5432)
+    password: SecretStr = env_field("PASSWORD")  # Required - will fail if missing
+
+@dataclass
+class AppSettings(EnvConfigBase):
+    database: DatabaseSettings = prefix_field("DB")
+    debug: bool = env_field("DEBUG", default=False)
+
+# Load from environment
+settings = AppSettings.load_from_env(app_prefix="MYAPP")
+
+# Access nested settings
+print(settings.database.host)  # Uses MYAPP_DB_HOST
+print(settings.password)       # SecretStr('**********')
+```
+
 ## Design Goals
 
 - Having an extremely explicit settings library that minimise the time spent fighting with settings
@@ -11,53 +51,11 @@ Born of the desire of having app config behaving in an explicit way, to zero in 
 - Any attributes with default that does NOT get replaced with an env var will be highlighted in logs (use DEBUG log level) which helps you quickly find typos in your Env Vars
 - Only supports environment variables to override the defaults 
 
-## Non goals
+## Non Goals
 
 - Loading from config files
 
-
-
-## Getting started
-
-```bash
-pip install sane_settings
-```
-
-
-```python
-from sane_settings import (
-    EnvConfigBase,
-    env_field,
-    prefix_field,
-)
-
-
-@dataclass
-class DatabaseSettings(EnvConfigBase):
-    """Database connection settings."""
-
-    # Database connection parameters
-    host: str = env_field("HOST", default="localhost")      # Database host
-    port: int = env_field("PORT", default=5432)             # Database port
-    user: str = env_field("USER", default="postgres")       # Database user
-    password: str = env_field("PASSWORD", default="postgres")  # Database password
-
-
-
-@dataclass
-class Settings(EnvConfigBase):
-    """Main application settings."""
-
-    # Nested Settings objects
-    database: DatabaseSettings = prefix_field("DB")     # Any nested attribute will be EXAMPLE__DB__{attribute}
-    # defaults at the end
-    SERVICE_NAME: str = "my-service"
-
-
-settings = Settings.load_from_env(app_prefix="EXAMPLE", pretty_check=True)
-```
-
-## Example
+## Advanced Example
 
 
 ```python
@@ -106,9 +104,16 @@ class Settings(EnvConfigBase):
 settings = Settings.load_from_env(app_prefix="APP", pretty_check=True)
 ```
 
+## Documentation
 
+| Document | Purpose |
+|----------|---------|
+| [User Guide](./docs/user-guide.md) | Getting started, configuration patterns, type casting, best practices |
+| [API Reference](./docs/api-reference.md) | Complete reference for all public classes and functions |
+| [Architecture Guide](./docs/architecture.md) | How the library works internally, type system, loading mechanism |
+| [Examples](./docs/examples.md) | Real-world usage patterns for common scenarios |
 
-## DEv
+## Development
 
 ### Release
 
