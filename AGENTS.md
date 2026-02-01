@@ -38,6 +38,35 @@ Always run tests before committing: `uv run pytest -v`
 - Use `just push-all` to push commits and tags together
 - Main branch is protected—never push directly to main
 
+## Release Workflow
+
+**CRITICAL: PyPI publishing requires tag push**
+
+The GitHub Actions workflow at `.github/workflows/build.yaml` triggers on tag pushes (`v*`), not regular commits:
+
+```yaml
+on:
+  push:
+    tags:
+      - 'v*'  # Only triggers on tags like v0.2.8
+```
+
+**Proper release flow:**
+1. Complete your feature/bug fix on a branch
+2. Create PR and merge to main
+3. On main: `just bump-patch` (creates commit + tag locally)
+4. **CRITICAL**: Use `just push-all` to push BOTH commits AND tags
+   - Wrong: `git push` (only pushes commits, tag stays local)
+   - Right: `just push-all` (pushes commits + tags, triggers PyPI)
+5. Verify tag exists on remote: `git ls-remote --tags origin`
+
+**If you already pushed commits but not the tag:**
+```bash
+git push origin v0.2.8  # Push just the tag to trigger workflow
+```
+
+**Common pitfall:** Pushing a feature branch with `git push origin fix/branch` only pushes commits. The version tag created by `just bump-patch` remains local, so the PyPI workflow never triggers.
+
 ## Commits & Communication
 
 - Be concise and direct
