@@ -35,7 +35,7 @@ def _cast_var(
                 config_kwargs[name] = raw_value
             else:
                 raise InvalidTypeError(
-                    f"Failed to cast env var '{full_env_var_name}' (value: '{raw_value}') to Literral for attribute '{name}'. Allowed values are {','.join(typing.get_args(ftype))}"
+                    f"Failed to cast env var '{full_env_var_name}' (value: '{raw_value}') to Literal for attribute '{name}'. Allowed values are {','.join(typing.get_args(ftype))}"
                 )
         elif typing.get_origin(ftype) in (types.UnionType, typing.Union):
             union_types = typing.get_args(ftype)
